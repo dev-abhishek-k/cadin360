@@ -1,0 +1,13 @@
+{
+  "name": "cadin360-visitor-journey",
+  "private": true,
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "npm run dev -w client",
+    "dev:server": "npm run dev -w server",
+    "test": "npm run test -w server && npm run test -w client",
+    "build": "npm run build -w client"
+  },
+  "devDependencies": { "concurrently": "^9.2.1" }
+}

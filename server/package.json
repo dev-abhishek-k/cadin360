@@ -1,0 +1,8 @@
+{
+  "name": "@cadin360/server",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "nodemon src/server.js", "start": "node src/server.js", "test": "node --test src/tests/**/*.test.js" },
+  "dependencies": { "cors": "^2.8.5", "dotenv": "^16.4.7", "express": "^4.21.2", "helmet": "^8.0.0", "mongoose": "^8.9.5", "morgan": "^1.10.0" },
+  "devDependencies": { "nodemon": "^3.1.9", "supertest": "^7.0.0" }
+}
