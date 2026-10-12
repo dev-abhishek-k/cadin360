@@ -1,0 +1,337 @@
+{
+  "info": {
+    "_postman_id": "b3e0c7a5-1122-4433-8899-cadin360vj2026",
+    "name": "CADIN360 Visitor Journey API Collection",
+    "description": "Production API collection for CADIN360 Visitor Journey Challenge Modules 1–8.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "guestCredential",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paymentAttemptId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication & Guest Sessions",
+      "item": [
+        {
+          "name": "Create Guest Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/guest-sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["guest-sessions"]
+            },
+            "description": "Creates an unauthenticated guest session and returns a 64-character unguessable credential."
+          }
+        },
+        {
+          "name": "Signup User (with Guest Session)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane CAD Engineer\",\n  \"email\": \"jane.cad@example.com\",\n  \"password\": \"Password123!\",\n  \"guestCredential\": \"{{guestCredential}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "signup"]
+            },
+            "description": "Registers a new user and associates the current guest session with their account."
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jane.cad@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticates user with email and password, returning JWT in cookie/body."
+          }
+        },
+        {
+          "name": "Associate Guest Session (Post-Login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guestCredential\": \"{{guestCredential}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/guest-sessions/associate",
+              "host": ["{{baseUrl}}"],
+              "path": ["guest-sessions", "associate"]
+            },
+            "description": "Associates an unassociated guest session to the authenticated user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Event Tracking & Ingestion",
+      "item": [
+        {
+          "name": "Ingest Page View Event (Guest)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-guest-session-credential", "value": "{{guestCredential}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"evt_page_view_101\",\n  \"type\": \"page_viewed\",\n  \"occurredAt\": \"2026-10-12T10:00:00.000Z\",\n  \"canonicalRoute\": \"/guest-dashboard/cad-practice/2d\",\n  \"source\": \"youtube\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            },
+            "description": "Records visitor interaction, normalizing route to '2D Exercises'."
+          }
+        },
+        {
+          "name": "Duplicate Event Retry (Idempotent 200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-guest-session-credential", "value": "{{guestCredential}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"evt_page_view_101\",\n  \"type\": \"page_viewed\",\n  \"occurredAt\": \"2026-10-12T10:00:00.000Z\",\n  \"canonicalRoute\": \"/guest-dashboard/cad-practice/2d\",\n  \"source\": \"youtube\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            },
+            "description": "Submitting identical event payload returns HTTP 200 with duplicate: true without creating duplicates."
+          }
+        },
+        {
+          "name": "Event ID Conflict (HTTP 409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-guest-session-credential", "value": "{{guestCredential}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"evt_page_view_101\",\n  \"type\": \"page_viewed\",\n  \"occurredAt\": \"2026-10-12T10:00:00.000Z\",\n  \"canonicalRoute\": \"/pricing\",\n  \"source\": \"google\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            },
+            "description": "Reusing existing eventId with changed immutable content returns HTTP 409 Conflict."
+          }
+        },
+        {
+          "name": "Browser Ingestion Rejects payment_completed (HTTP 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"evt_forged_pay_01\",\n  \"type\": \"payment_completed\",\n  \"occurredAt\": \"2026-10-12T10:15:00.000Z\",\n  \"canonicalRoute\": \"/pricing\",\n  \"metadata\": { \"verified\": true }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            },
+            "description": "The browser public event endpoint strictly rejects payment_completed events."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Mock Payments & Verification",
+      "item": [
+        {
+          "name": "List Mock Plans",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/mock-payments/plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["mock-payments", "plans"]
+            },
+            "description": "Fetches trusted server catalog of mock plans."
+          }
+        },
+        {
+          "name": "Create Mock Payment Attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"pro\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mock-payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["mock-payments"]
+            },
+            "description": "Creates pending payment attempt using server-authoritative amount ($49.00)."
+          }
+        },
+        {
+          "name": "Simulate Mock Payment - Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outcome\": \"success\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mock-payments/{{paymentAttemptId}}/simulate",
+              "host": ["{{baseUrl}}"],
+              "path": ["mock-payments", "{{paymentAttemptId}}", "simulate"]
+            },
+            "description": "Simulates successful outcome, transitions attempt to succeeded, and triggers server-side payment_completed event."
+          }
+        },
+        {
+          "name": "Simulate Mock Payment - Failure",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outcome\": \"failure\",\n  \"reason\": \"insufficient_funds\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mock-payments/{{paymentAttemptId}}/simulate",
+              "host": ["{{baseUrl}}"],
+              "path": ["mock-payments", "{{paymentAttemptId}}", "simulate"]
+            },
+            "description": "Simulates payment failure. Transitions status to failed without generating payment event."
+          }
+        },
+        {
+          "name": "Read Payment Attempt Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mock-payments/{{paymentAttemptId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mock-payments", "{{paymentAttemptId}}"]
+            },
+            "description": "Fetches current payment attempt details for owner or admin."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Admin Journey Dashboard & Timeline",
+      "item": [
+        {
+          "name": "Admin Journey Dashboard (Filtered)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/journeys?page=1&limit=25&source=youtube&stage=paid",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "journeys"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "25" },
+                { "key": "source", "value": "youtube" },
+                { "key": "stage", "value": "paid" }
+              ]
+            },
+            "description": "Admin endpoint returning paginated visitor journeys and overall filtered summary metrics."
+          }
+        },
+        {
+          "name": "Admin Journey Details & Timeline",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/journeys/user_670aa210e3f2b1897c5e2195?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "journeys", "user_670aa210e3f2b1897c5e2195"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "50" }
+              ]
+            },
+            "description": "Fetches unified journey summary and chronologically ordered events for a specific visitor."
+          }
+        }
+      ]
+    }
+  ]
+}

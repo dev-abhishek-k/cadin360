@@ -7,6 +7,13 @@
     "dev:client": "npm run dev -w client",
     "dev:server": "npm run dev -w server",
     "test": "npm run test -w server && npm run test -w client",
+    "test:server": "npm run test -w server",
+    "test:client": "npm run test -w client",
+    "test:unit": "npm run test:unit -w server",
+    "test:integration": "npm run test:integration -w server",
+    "seed": "npm run seed -w server",
+    "seed:reset": "npm run seed:reset -w server",
+    "explain": "npm run explain -w server",
     "build": "npm run build -w client"
   },
   "devDependencies": { "concurrently": "^9.2.1" }

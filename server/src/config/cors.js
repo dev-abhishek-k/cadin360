@@ -1,3 +1,6 @@
 export function corsOptions(clientUrl) {
-  return { origin: clientUrl };
+  return {
+    origin: clientUrl,
+    credentials: true,
+  };
 }
