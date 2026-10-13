@@ -20,7 +20,7 @@ function generateToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 }
 
-test('Module 7: Mock Payment Verification Integration Tests', async (t) => {
+test('Mock payment creation, verification, and idempotency', async (t) => {
   // Test Stores
   const attemptStore = new Map();
   const eventStore = new Map();

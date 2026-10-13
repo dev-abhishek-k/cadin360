@@ -143,7 +143,7 @@ export default function Plans() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">
-                  Module 7: Mock Payment Verification
+                  Mock Payment Verification
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               </div>

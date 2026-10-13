@@ -16,9 +16,6 @@ export default function EventTrackerActions({
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               Visitor Event Simulator
             </h3>
-            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60">
-              Module 2
-            </span>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
             Trigger real visitor interactions. Recorded with client UUIDs, canonical route aliases, and atomic deduplication.

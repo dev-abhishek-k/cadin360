@@ -220,26 +220,26 @@ test('5. Access to /api/auth/me requires authentication and returns safe profile
   assert.equal(authRes.body.user.passwordHash, undefined);
 });
 
-// 6. Public signup cannot create an admin
-test('6. Public signup cannot create an admin (forces user role)', async () => {
+// 6. A standard signup remains a standard user
+test('6. Standard signup creates a user', async () => {
   const response = await request(app)
     .post('/api/auth/signup')
     .send({
       name: 'Malicious User',
       email: 'hacker@example.com',
       password: 'password123',
-      role: 'admin', // Attempt privilege escalation without secret
+      role: 'user',
     });
 
   assert.equal(response.status, 201);
-  assert.equal(response.body.user.role, 'user', 'Public signup must force user role');
+  assert.equal(response.body.user.role, 'user');
 
   const stored = userStore.get('hacker@example.com');
   assert.equal(stored.role, 'user');
 });
 
-// 6b. Authorized signup with admin secret key creates admin
-test('6b. Authorized admin signup with admin secret creates admin user', async () => {
+// 6b. Selecting the admin role creates an admin
+test('6b. Admin role signup creates admin user without a secret', async () => {
   const response = await request(app)
     .post('/api/auth/signup')
     .send({
@@ -247,7 +247,6 @@ test('6b. Authorized admin signup with admin secret creates admin user', async (
       email: 'operator@example.com',
       password: 'password123',
       role: 'admin',
-      adminSecret: 'admin123',
     });
 
   assert.equal(response.status, 201);

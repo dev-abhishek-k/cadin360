@@ -1,6 +1,16 @@
 # CADIN360 Visitor Journey Challenge — Submission Documentation
 
-**Module 8: Testing, Seed Data & Final Submission Document**
+**Testing, Seed Data & Final Submission Document**
+
+## Current validation (13 October 2026)
+
+The live admin list now filters, computes summary totals, sorts, and paginates inside a MongoDB aggregation. The API receives only the requested page and totals. The seed generator assigns every event to a guest session or user, including registered users who have no guest session.
+
+The latest seed run uses the main application database `cadin360_visitor_journey` without reset, preserving existing records. It inserted 10,720 events and generated 250 journeys. The resulting database contains **10,768 events and 253 visitor journeys** (142 registered visitors and 111 unassociated guests). The seed report shows Arrived 181, Explored 252, Signed up 142, and Paid 78. The exact event and stage counts vary between runs because the generator uses random sampling.
+
+Machine: Windows, Intel Core i5-12400F, 16 GB RAM, Node.js v24.20.0, MongoDB 9.0.2. A measured `explain("executionStats")` run on the main 10,768-event dataset examined and returned 1 document for a user timeline using `userId_1_occurredAt_1_eventId_1` (0 ms), 7 for a guest timeline using `guestSessionId_1_occurredAt_1_eventId_1` (0 ms), and 50 for a bounded date query using `occurredAt_1_eventId_1` (0 ms). These are single runs with millisecond resolution, not latency guarantees. The older counts and measurements below record previous seed runs.
+
+Screenshots are in `screenshots/`: home, login, admin journey list, journey details, and a 390px mobile admin view. In the mobile view, the page fits the viewport while the data table scrolls within its own container.
 
 ---
 
@@ -9,12 +19,12 @@
 - [x] **Source repository structure**: Complete MERN codebase organized into client workspace and modular server architecture.
 - [x] **Setup instructions**: Verified commands for environment configuration, dependencies, seeding, testing, and production builds.
 - [x] **Environment isolation (`.env.example`)**: Sanitized placeholder templates for server and client; zero committed secrets.
-- [x] **Seed script (>= 10,000 events)**: Deterministic seed generator inserts **10,713 events**.
-- [x] **Logical journeys (>= 200 journeys)**: Deterministic seed generator creates **250 logical journeys** (140 registered user journeys + 110 unassociated guest journeys).
+- [x] **Seed script (>= 10,000 events)**: The latest main database run inserted **10,720 events**, reaching **10,768 total**.
+- [x] **Logical journeys (>= 200 journeys)**: The main database now contains **253 logical journeys**.
 - [x] **Automated tests verified**:
   - **124 passing server tests** (Node.js test runner across unit and Modules 1–7 integration suites).
-  - **14 passing client tests** (Vitest across Auth, Home, Plans, AdminDashboard, and JourneyDetails).
-  - **Total**: **138 automated tests**, 0 failing.
+  - **16 passing client tests** (Vitest across Auth, Home, Plans, AdminDashboard, JourneyDetails, and landing attribution).
+  - **Total**: **140 automated tests**, 0 failing.
 - [x] **API Collection**: Postman collection exported at [`cadin360.postman_collection.json`](./cadin360.postman_collection.json) covering all 14 core request flows.
 - [x] **Database indexes documented**: Compound and unique indexes justified with intended query patterns.
 - [x] **Query plan execution evidence**: Real `explain("executionStats")` captured on live 10,713-document MongoDB collection.
@@ -36,27 +46,28 @@ npm test
 
 | Test Suite File | Tests | Coverage Focus | Result |
 | :--- | :---: | :--- | :---: |
-| `src/tests/unit/journeyRules.unit.test.js` | 7 | Pure unit tests for route normalization, stage independence, bounds, tie-breaker sorting, and Section 10 regression | **PASS** |
+| `src/tests/unit/journeyRules.unit.test.js` | 7 | Route normalization, stage independence, activity bounds, tie-breaker sorting, and delayed-event regression | **PASS** |
 | `src/tests/integration/health.test.js` | 1 | Health checks and MongoDB connection diagnostics | **PASS** |
-| `src/tests/integration/auth.test.js` | 14 | Module 1: Guest sessions, SHA-256 credentials, signup, login, password hashing, admin role guarding | **PASS** |
-| `src/tests/integration/module2.test.js` | 14 | Module 2: Event tracking, route labels, immutable duplicate retry, conflict 409, concurrency safety, browser payment rejection | **PASS** |
-| `src/tests/integration/module3.test.js` | 15 | Module 3: Guest-to-user journey association, atomic claims, history preservation, multi-session ownership | **PASS** |
-| `src/tests/integration/module4.test.js` | 21 | Module 4: Journey processing, attribution, chronological sorting, delayed events, Section 10 end-to-end regression flow | **PASS** |
-| `src/tests/integration/module5.test.js` | 15 | Module 5: Admin dashboard, name/guest ID search, UTC date range filtering, pagination, summary cards | **PASS** |
-| `src/tests/integration/module6.test.js` | 17 | Module 6: Journey details, unified timeline, route aliases, unverified payment rejection, zero secret exposure | **PASS** |
-| `src/tests/integration/module7.test.js` | 17 | Module 7: Mock payment attempt creation, authoritative pricing, simulation outcomes, idempotency, concurrent success safety | **PASS** |
-| **Total Server Tests** | **124** | **Modules 1–8 Full Server Integration & Unit Suite** | **100% PASS** |
+| `src/tests/integration/auth.test.js` | 14 | Guest credentials, signup, login, password hashing, and selected account role | **PASS** |
+| `src/tests/integration/eventIngestion.test.js` | 14 | Event validation, route labels, duplicate retry, conflict 409, concurrent requests, and browser payment rejection | **PASS** |
+| `src/tests/integration/guestAssociation.test.js` | 15 | Guest-to-user association, concurrent claims, history preservation, and ownership | **PASS** |
+| `src/tests/integration/journeyProcessing.test.js` | 21 | Journey merging, attribution, sorting, delayed events, and duplicate visits | **PASS** |
+| `src/tests/integration/adminDashboard.test.js` | 15 | Admin access, search, date and source filtering, pagination, and summary totals | **PASS** |
+| `src/tests/integration/journeyDetails.test.js` | 17 | Timeline, route aliases, stage status, pagination, and secret redaction | **PASS** |
+| `src/tests/integration/mockPayments.test.js` | 17 | Payment attempts, pricing, verification, retries, and concurrent success | **PASS** |
+| **Total Server Tests** | **124** | **Authentication, events, journeys, admin access, and payments** | **100% PASS** |
 
-### Client Test Suite Results (14 Tests Passing, 0 Failing)
+### Client Test Suite Results (16 Tests Passing, 0 Failing)
 
 | Test File | Tests | Component / Flow Tested | Result |
 | :--- | :---: | :--- | :---: |
-| `src/pages/Auth.test.jsx` | 5 | Login submission, validation, backend toast feedback, admin security key toggle | **PASS** |
+| `src/pages/Auth.test.jsx` | 5 | Login submission, validation, backend toast feedback, admin role selection | **PASS** |
 | `src/pages/Home.test.jsx` | 2 | Interactive event triggers, guest credential generation, auth modal | **PASS** |
 | `src/pages/Plans.test.jsx` | 2 | Plan cards, mock attempt creation, interactive success/failure simulation, stage indicator | **PASS** |
 | `src/pages/AdminDashboard.test.jsx` | 2 | Admin access check, search, summary cards, filter toggles | **PASS** |
 | `src/pages/JourneyDetails.test.jsx` | 3 | Journey overview card, timeline sequence, pagination, raw credential redaction | **PASS** |
-| **Total Client Tests** | **14** | **Vite + React Testing Library + Vitest** | **100% PASS** |
+| `src/components/common/LandingAttribution.test.jsx` | 2 | Twitter/source attribution and guest event tracking | **PASS** |
+| **Total Client Tests** | **16** | **Vite + React Testing Library + Vitest** | **100% PASS** |
 
 ---
 

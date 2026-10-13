@@ -737,7 +737,7 @@ test('20. The service does not expose credentials or sensitive fields', async ()
 // -------------------------------------------------------------
 // REQUIRED SECTION 10 EXAMPLE SCENARIO TEST
 // -------------------------------------------------------------
-test('Section 10 Scenario: Guest A YouTube -> 2D -> Signup -> 2D -> Delayed 09:00 -> Retries', async () => {
+test('Delayed YouTube arrival and duplicate 2D visits merge into one signup journey', async () => {
   // 1. Create Guest A
   const guestRes = await request(app).post('/api/guest-sessions').send({});
   const { guestCredential, guestSession } = guestRes.body.data;

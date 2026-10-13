@@ -12,8 +12,8 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
+        <Link to="/" className="flex items-center gap-3 group self-start shrink-0">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform duration-200">
             <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -22,7 +22,7 @@ export default function Navbar() {
           <div className="flex flex-col">
             <span className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
               CADIN360
-              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/60">
+              <span className="hidden sm:inline text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/60">
                 Auth Ready
               </span>
             </span>
@@ -30,10 +30,10 @@ export default function Navbar() {
           </div>
         </Link>
 
-        <nav className="flex items-center gap-3">
+        <nav className="flex flex-wrap items-center gap-1 sm:gap-3 w-full sm:w-auto min-w-0">
           <Link
             to="/"
-            className="text-sm font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg hover:bg-slate-800/60 transition"
+            className="text-xs sm:text-sm font-medium text-slate-300 hover:text-white px-2 sm:px-3 py-1.5 rounded-lg hover:bg-slate-800/60 transition"
           >
             System Status
           </Link>
@@ -41,7 +41,7 @@ export default function Navbar() {
           <Link
             to="/plans"
             id="nav-plans-link"
-            className="text-sm font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg hover:bg-slate-800/60 transition flex items-center gap-1.5"
+            className="text-xs sm:text-sm font-medium text-slate-300 hover:text-white px-2 sm:px-3 py-1.5 rounded-lg hover:bg-slate-800/60 transition flex items-center gap-1.5"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             Plans & Mock Pay
@@ -51,7 +51,7 @@ export default function Navbar() {
             <Link
               to="/admin/journeys"
               id="nav-admin-link"
-              className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 px-3 py-1.5 rounded-lg hover:bg-cyan-950/40 border border-cyan-800/50 transition flex items-center gap-1.5"
+              className="text-xs sm:text-sm font-semibold text-cyan-400 hover:text-cyan-300 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-cyan-950/40 border border-cyan-800/50 transition flex items-center gap-1.5"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               Admin Dashboard
@@ -59,8 +59,8 @@ export default function Navbar() {
           )}
 
           {user ? (
-            <div className="flex items-center gap-3 pl-3 border-l border-slate-800">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center gap-2 sm:gap-3 sm:pl-3 sm:border-l border-slate-800">
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800">
                 <div className="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 flex items-center justify-center text-xs font-bold uppercase">
                   {user.name?.charAt(0) || 'U'}
                 </div>

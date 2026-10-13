@@ -39,7 +39,7 @@ export async function seedJourneysDataset({
   await connectDatabase(config.mongodbUri);
 
   console.log('=====================================================');
-  console.log('   CADIN360 Deterministic Journey Seed Generator     ');
+  console.log('   CADIN360 Journey Seed Generator                   ');
   console.log('=====================================================');
   console.log(`Environment: ${config.nodeEnv}`);
   console.log(`Database URI: ${config.mongodbUri}`);
@@ -175,6 +175,7 @@ export async function seedJourneysDataset({
   const baseTime = Date.now() - 28 * 86400000; // 28 days ago
 
   let eventGlobalSeq = 1;
+  const seedRunId = crypto.randomUUID();
 
   for (const journey of totalJourneysList) {
     const eventCount = randomBetween(Math.max(8, eventsPerJourneyAvg - 15), eventsPerJourneyAvg + 20);
@@ -195,7 +196,7 @@ export async function seedJourneysDataset({
     // Event 1: Initial link open if arrived
     if (willArrive && initialSource) {
       eventsToInsert.push({
-        eventId: `seed_evt_${eventGlobalSeq++}`,
+        eventId: `seed_evt_${seedRunId}_${eventGlobalSeq++}`,
         type: EVENT_TYPES.SHORT_LINK_OPENED,
         occurredAt: new Date(currentTime),
         receivedAt: new Date(currentTime + randomBetween(50, 500)),
@@ -204,7 +205,7 @@ export async function seedJourneysDataset({
         canonicalLabel: 'Plans',
         source: initialSource,
         guestSessionId: initialGuestSession ? initialGuestSession._id : null,
-        userId: null,
+        userId: isUser && !initialGuestSession ? user._id : null,
       });
       currentTime += randomBetween(30000, 120000);
     }
@@ -230,7 +231,7 @@ export async function seedJourneysDataset({
         : EVENT_TYPES.EXERCISE_SUBMITTED;
 
       eventsToInsert.push({
-        eventId: `seed_evt_${eventGlobalSeq++}`,
+        eventId: `seed_evt_${seedRunId}_${eventGlobalSeq++}`,
         type: eventType,
         occurredAt: new Date(currentTime),
         receivedAt: new Date(currentTime + randomBetween(50, 1000)),
@@ -240,7 +241,7 @@ export async function seedJourneysDataset({
         exerciseName: is2D ? 'Flange Bracket 2D' : 'Shaft Assembly 3D',
         source: null,
         guestSessionId: activeSession ? activeSession._id : null,
-        userId: isAuthEvent ? user._id : null,
+        userId: isAuthEvent || (isUser && !activeSession) ? user._id : null,
       });
     }
 
@@ -248,7 +249,7 @@ export async function seedJourneysDataset({
     if (isUser) {
       currentTime += randomBetween(45000, 180000);
       eventsToInsert.push({
-        eventId: `seed_evt_${eventGlobalSeq++}`,
+        eventId: `seed_evt_${seedRunId}_${eventGlobalSeq++}`,
         type: EVENT_TYPES.SIGNUP_COMPLETED,
         occurredAt: new Date(currentTime),
         receivedAt: new Date(currentTime + 100),
@@ -266,7 +267,7 @@ export async function seedJourneysDataset({
         currentTime += randomBetween(60000, 300000);
         const planKey = randomChoice(['basic', 'starter', 'pro', 'enterprise']);
         const plan = MOCK_PLANS[planKey];
-        const payAttemptId = `pay_att_seed_${user._id.toString().slice(-6)}_${randomBetween(1000, 9999)}`;
+        const payAttemptId = `pay_att_seed_${seedRunId}_${user._id.toString().slice(-6)}`;
 
         paymentAttemptsToInsert.push({
           paymentAttemptId: payAttemptId,
@@ -313,7 +314,7 @@ export async function seedJourneysDataset({
       } else if (Math.random() < 0.2) {
         // Failed mock payment
         currentTime += randomBetween(30000, 180000);
-        const failAttemptId = `pay_att_fail_${user._id.toString().slice(-6)}_${randomBetween(1000, 9999)}`;
+        const failAttemptId = `pay_att_fail_${seedRunId}_${user._id.toString().slice(-6)}`;
         paymentAttemptsToInsert.push({
           paymentAttemptId: failAttemptId,
           journeyIdentity: `user_${user._id}`,
@@ -333,7 +334,7 @@ export async function seedJourneysDataset({
         });
       } else if (Math.random() < 0.15) {
         // Pending mock payment
-        const pendAttemptId = `pay_att_pend_${user._id.toString().slice(-6)}_${randomBetween(1000, 9999)}`;
+        const pendAttemptId = `pay_att_pend_${seedRunId}_${user._id.toString().slice(-6)}`;
         paymentAttemptsToInsert.push({
           paymentAttemptId: pendAttemptId,
           journeyIdentity: `user_${user._id}`,

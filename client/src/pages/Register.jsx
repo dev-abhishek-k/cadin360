@@ -15,7 +15,6 @@ export default function Register() {
     password: '',
     confirmPassword: '',
     role: USER_ROLES.USER,
-    adminSecret: 'admin123',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -53,16 +52,10 @@ export default function Register() {
         guestCredential: guestCredential || undefined,
       };
 
-      if (formData.role === USER_ROLES.ADMIN) {
-        payload.adminSecret = (formData.adminSecret || 'admin123').trim();
-      }
-
       const result = await register(payload);
 
       if (result.success) {
-        if (formData.role === USER_ROLES.ADMIN && result.user?.role !== USER_ROLES.ADMIN) {
-          toast.warning('Account created as standard user. Invalid admin security key provided.');
-        } else if (result.user?.role === USER_ROLES.ADMIN) {
+        if (result.user?.role === USER_ROLES.ADMIN) {
           toast.success('Admin privileges successfully granted!');
         }
         navigate('/');
@@ -161,31 +154,6 @@ export default function Register() {
               </select>
             </div>
 
-            {formData.role === USER_ROLES.ADMIN && (
-              <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="register-admin-secret" className="block text-xs font-bold uppercase tracking-wider text-cyan-300">
-                    Admin Security Key
-                  </label>
-                  <span className="text-[11px] text-slate-400">
-                    Default: <code className="text-cyan-300 font-mono bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-800/60">admin123</code>
-                  </span>
-                </div>
-                <input
-                  id="register-admin-secret"
-                  name="adminSecret"
-                  type="password"
-                  value={formData.adminSecret}
-                  onChange={handleChange}
-                  placeholder="Enter admin security key (default: admin123)"
-                  className="w-full rounded-xl border border-cyan-700/60 bg-slate-900/90 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 transition font-mono"
-                />
-                <p className="text-[11px] text-slate-400">
-                  Required to register with administrator access to the Visitor Journey Dashboard.
-                </p>
-              </div>
-            )}
-
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label htmlFor="register-password" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
@@ -233,7 +201,7 @@ export default function Register() {
               disabled={submitting}
               className="w-full mt-2 rounded-xl bg-cyan-400 py-3.5 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-wait shadow-lg shadow-cyan-500/20"
             >
-              {submitting ? 'Creating Account…' : 'Register & Log In'}
+              {submitting ? 'Creating Account…' : 'Register'}
             </button>
           </form>
 

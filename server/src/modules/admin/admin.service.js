@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { adminJourneyRepository } from './admin.repository.js';
 import { journeyService } from '../events/journey.service.js';
 import { ApiError } from '../../shared/utils/ApiError.js';
@@ -60,6 +61,19 @@ export const adminJourneyService = {
 
     // 2. Validate UTC date range
     const { startUtc, endUtc } = parseUtcDateRange(startDate, endDate);
+
+    // The live repository performs filtering, totals, and pagination in MongoDB.
+    // Injected fixture repositories retain the in-memory path used by unit tests.
+    if (typeof repo.getPaginatedJourneys === 'function' && mongoose.connection.readyState === 1) {
+      return repo.getPaginatedJourneys({
+        search: String(search || '').trim(),
+        source: String(source || '').trim(),
+        startUtc,
+        endUtc,
+        page: parsedPage,
+        limit: parsedLimit,
+      });
+    }
 
     // 3. Fast lookup data from repository
     const { users, unassociatedGuestSessions, eventJourneys } = await repo.getAdminJourneysData();

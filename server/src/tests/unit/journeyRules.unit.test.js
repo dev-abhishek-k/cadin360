@@ -166,7 +166,7 @@ test('Unit: Deterministic sorting and tie-breaker by occurredAt then eventId', (
   assert.equal(sorted[1].eventId, 'evt_zebra');
 });
 
-test('Unit: Module 4 / Section 10 End-to-End Regression Flow', () => {
+test('Unit: delayed arrival, duplicate visits, and signup produce correct journey metrics', () => {
   // Scenario:
   // - 09:00: YouTube short link (delayed arrival)
   // - 09:01: 2D exercise viewed (delivered twice)

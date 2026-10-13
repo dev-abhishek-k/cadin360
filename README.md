@@ -952,6 +952,7 @@ Copy-Item client/.env.example client/.env
 ```
 
 Ensure MongoDB is reachable at `mongodb://127.0.0.1:27017` or update `MONGODB_URI` in `server/.env`.
+Set a local `JWT_SECRET` and `ADMIN_PASSWORD` in `server/.env` before starting the server. On Windows, if MongoDB is installed as a service but stopped, run `Start-Service MongoDB` in an elevated PowerShell window.
 
 ### 2. Seeding an Initial Admin User & Dataset
 ```powershell
@@ -966,9 +967,11 @@ npm run seed:reset
 ```
 *Note: Admin configured via `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in `server/.env`.*
 
+To keep your working data separate from assessment fixtures, set `MONGODB_URI=mongodb://127.0.0.1:27017/cadin360_assignment_demo` in a separate shell before running `npm run seed` and `npm run explain`. The database connection uses the database name in the URI. The latest demo run had 10,950 events and 250 journeys.
+
 ### 3. Inspecting MongoDB Query Plans
 ```powershell
-# Run real explain("executionStats") on live 10,713-document dataset
+# Run real explain("executionStats") on the current seeded dataset
 npm run explain
 ```
 
@@ -1067,7 +1070,7 @@ npm run test -w client
 6. **Deterministic sorting & tie-breaking**: Events with identical `occurredAt` timestamps strictly tie-break on `eventId` ascending.
 7. **Module 4 / Section 10 regression scenario**: Verifies 09:00 YouTube delayed, 09:01 duplicated 2D, 09:03 signup, and 09:04 user 2D resolves to 1 journey, 4 unique events, first source YouTube, and Paid false.
 
-#### Module 1: Authentication & Guest Sessions (14 Server Tests)
+#### Authentication and guest sessions (14 server tests)
 1. **Guest session creation**: Returns raw 64-character unguessable credential, verifies SHA-256 hash in database, ensures hashes are never exposed in API output.
 2. **Successful signup & password hashing**: Email normalization, bcrypt hashing verification, safe user profile returned.
 3. **Duplicate email rejection**: Rejects duplicate emails with HTTP 409 Conflict.
@@ -1079,7 +1082,7 @@ npm run test -w client
 9. **A second user cannot claim an already-owned guest session**: Rejects with HTTP 409 Conflict.
 10. **Zero hash exposure**: Ensures `passwordHash` and `credentialHash` are never leaked across any endpoint.
 
-#### Module 2: Event Tracking & Ingestion (14 Server Tests)
+#### Event tracking and ingestion (14 server tests)
 1. **Valid guest event saved**: Ingests `page_viewed` with canonical route mapping (`/guest-dashboard/cad-practice/2d` &rarr; `2D Exercises`).
 2. **Valid authenticated-user event saved**: Automatically associates event with authenticated `userId`.
 3. **Unsupported event types rejected**: Rejects unknown event types with HTTP 400.
@@ -1095,7 +1098,7 @@ npm run test -w client
 13. **Chronological sorting tie-breaker**: Verifies deterministic query ordering by `occurredAt ASC, eventId ASC`.
 14. **Client-supplied identity stripping**: Ignores forged client-submitted `userId` and `role` fields.
 
-#### Module 3: Guest-to-User Journey Association (15 Server Tests)
+#### Guest-to-user journey association (15 server tests)
 1. **Valid unowned guest session associated**: Authenticated user claims unowned session via `POST /api/guest-sessions/associate`.
 2. **Guest historical events preserved**: Original `eventId`, `occurredAt`, `receivedAt`, type, source, and routes remain unchanged.
 3. **Repeated association by same user**: Idempotent success returning `alreadyAssociated: true` without creating duplicate events.
@@ -1112,7 +1115,7 @@ npm run test -w client
 14. **Unified journey event retrieval**: `GET /api/events/journey` retrieves guest history and user events chronologically.
 15. **Event preservation under repeated calls**: Repeated associations never delete or duplicate historical events.
 
-#### Module 4: Journey Processing & Attribution (21 Server Tests)
+#### Journey processing and attribution (21 server tests)
 1. **Guest without account**: Resolves to exactly one guest journey with all guest events.
 2. **Registered user with single guest session**: Resolves to one combined user journey.
 3. **Registered user with multiple guest sessions**: Resolves to one combined journey containing all sessions' events.
@@ -1135,7 +1138,7 @@ npm run test -w client
 20. **Sensitive data protection**: Credentials, hashes, and internal tokens are never exposed in summaries or timelines.
 21. **Section 10 End-to-End Scenario**: Complete flow (delayed YouTube event, 2D exploration, signup, user 2D visit, retried navigation) resolves to exactly 1 user journey, 4 unique events, first source YouTube, distinct 2D visits, Arrived/Explored/Signed up reached, and Paid false.
 
-#### Module 5: Admin Journey Dashboard (15 Server Tests)
+#### Admin journey dashboard (15 server tests)
 1. **Anonymous rejection**: Anonymous requests rejected with HTTP 401 Unauthorized.
 2. **Non-admin rejection**: Non-admin users rejected with HTTP 403 Forbidden.
 3. **Admin authorization**: Valid admin JWT granted access with HTTP 200 OK.
@@ -1152,7 +1155,7 @@ npm run test -w client
 14. **Safe filter and bound handling**: Inverted dates return 400; negative pages or limits safely bounded.
 15. **Safe empty results**: Clean empty results and total metrics when no records match.
 
-#### Module 6: Journey Details & Timeline (17 Server Tests)
+#### Journey details and timeline (17 server tests)
 1. **Admin journey access**: Admin can access journey details (`200 OK`) with complete summary and timeline.
 2. **Anonymous rejection**: Anonymous callers rejected (`401 Unauthorized`).
 3. **Non-admin rejection**: Authenticated regular users rejected (`403 Forbidden`).
@@ -1171,7 +1174,7 @@ npm run test -w client
 16. **Timeline pagination accuracy**: Correct pagination metadata (`page`, `limit`, `total`, `totalPages`, `hasNextPage`, `hasPrevPage`).
 17. **Zero secret exposure**: Passwords, credential hashes, and internal tokens are never leaked in API output.
 
-#### Module 7: Mock Payment Verification (17 Server Tests)
+#### Mock payment verification (17 server tests)
 1. **Valid plan creates pending attempt**: Returns safe attempt details with `pending` status.
 2. **Invalid plan rejection**: Rejects unknown plan identifier with HTTP 400 Bad Request.
 3. **Authoritative pricing**: Server ignores client-supplied `amount` and `currency` overrides.

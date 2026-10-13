@@ -20,7 +20,8 @@ try {
   }
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
-} catch {
-  console.error('Database connection failed');
+} catch (error) {
+  const detail = error?.cause?.code || error?.code || error?.name || 'unknown error';
+  console.error(`Database connection failed (${detail}). Check MONGODB_URI and that MongoDB is running.`);
   process.exit(1);
 }

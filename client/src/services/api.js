@@ -35,11 +35,14 @@ export const associateGuestSession = (credential) =>
 
 
 // Event ingestion endpoints
-export const ingestEvent = (eventData) => api.post('/events', eventData);
+export const ingestEvent = (eventData, guestCredential) =>
+  api.post('/events', eventData, guestCredential
+    ? { headers: { 'x-guest-session-credential': guestCredential } }
+    : undefined);
 export const fetchJourneyEvents = () => api.get('/events/journey');
 export const fetchJourneySummary = (params = {}) => api.get('/events/journey/summary', { params });
 
-// Mock payment verification endpoints (Module 7)
+// Mock payment verification endpoints
 export const verifyMockPayment = (paymentData) => api.post('/payments/verify-mock', paymentData);
 export const fetchPlans = () => api.get('/mock-payments/plans');
 export const createMockPaymentAttempt = (payload) => api.post('/mock-payments', payload);

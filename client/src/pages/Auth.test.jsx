@@ -48,7 +48,7 @@ test('Login page submits credentials and handles error with toast and alert', as
 
   const emailInput = screen.getByLabelText(/Email Address/i);
   const passwordInput = screen.getByLabelText(/Password/i);
-  const submitButton = screen.getByRole('button', { name: /Sign In with HttpOnly Cookie/i });
+  const submitButton = screen.getByRole('button', { name: /^Sign In$/i });
 
   await userEvent.type(emailInput, 'wrong@example.com');
   await userEvent.type(passwordInput, 'wrongpassword');
@@ -85,7 +85,7 @@ test('Toast displays backend success message upon registration', async () => {
   await userEvent.type(screen.getByLabelText(/Email Address/i), 'test@example.com');
   await userEvent.type(screen.getByLabelText(/^Password$/i), 'password123');
   await userEvent.type(screen.getByLabelText(/Confirm Password/i), 'password123');
-  await userEvent.click(screen.getByRole('button', { name: /Register & Log In/i }));
+  await userEvent.click(screen.getByRole('button', { name: /^Register$/i }));
 
   await waitFor(() => {
     expect(screen.getByText('Registration successful')).toBeTruthy();
@@ -109,7 +109,7 @@ test('Register page validates password confirmation and short password', async (
   const emailInput = screen.getByLabelText(/Email Address/i);
   const passwordInput = screen.getByLabelText(/^Password$/i);
   const confirmPasswordInput = screen.getByLabelText(/Confirm Password/i);
-  const submitButton = screen.getByRole('button', { name: /Register & Log In/i });
+  const submitButton = screen.getByRole('button', { name: /^Register$/i });
 
   await userEvent.type(nameInput, 'Bob Tester');
   await userEvent.type(emailInput, 'bob@example.com');
@@ -164,7 +164,7 @@ test('Navbar displays authenticated user and allows logout with toast notificati
   });
 });
 
-test('Register page reveals admin security key when admin role is selected and sends adminSecret', async () => {
+test('Register page sends selected admin role without a secret', async () => {
   api.fetchCurrentUser.mockRejectedValue(new Error('unauthenticated'));
   api.signupUser.mockResolvedValueOnce({
     data: {
@@ -188,13 +188,13 @@ test('Register page reveals admin security key when admin role is selected and s
   const roleSelect = screen.getByLabelText(/Account Role/i);
   await userEvent.selectOptions(roleSelect, 'admin');
 
-  expect(screen.getByLabelText(/Admin Security Key/i)).toBeTruthy();
+  expect(screen.queryByLabelText(/Admin Security Key/i)).toBeNull();
 
   await userEvent.type(screen.getByLabelText(/Full Name/i), 'Admin User');
   await userEvent.type(screen.getByLabelText(/Email Address/i), 'admin@example.com');
   await userEvent.type(screen.getByLabelText(/^Password$/i), 'password123');
   await userEvent.type(screen.getByLabelText(/Confirm Password/i), 'password123');
-  await userEvent.click(screen.getByRole('button', { name: /Register & Log In/i }));
+  await userEvent.click(screen.getByRole('button', { name: /^Register$/i }));
 
   await waitFor(() => {
     expect(api.signupUser).toHaveBeenCalledWith(
@@ -202,7 +202,6 @@ test('Register page reveals admin security key when admin role is selected and s
         name: 'Admin User',
         email: 'admin@example.com',
         role: 'admin',
-        adminSecret: 'admin123',
       })
     );
   });

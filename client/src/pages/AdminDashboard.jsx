@@ -128,7 +128,6 @@ export default function AdminDashboard() {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            timeZone: 'UTC',
             timeZoneName: 'short',
           });
     } catch (_e) {
@@ -199,9 +198,6 @@ export default function AdminDashboard() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
               Admin Journey Dashboard
             </h1>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/80">
-              Module 5
-            </span>
           </div>
           <p className="text-sm text-slate-400 mt-1">
             Monitor, attribute, and explore visitor journey progression across guest and authenticated sessions.
@@ -494,8 +490,8 @@ export default function AdminDashboard() {
                 <tr>
                   <th scope="col" className="px-5 py-3.5 font-semibold">Visitor</th>
                   <th scope="col" className="px-4 py-3.5 font-semibold">Identity Type</th>
-                  <th scope="col" className="px-4 py-3.5 font-semibold">First Activity</th>
-                  <th scope="col" className="px-4 py-3.5 font-semibold">Last Activity</th>
+                  <th scope="col" className="px-4 py-3.5 font-semibold">First Activity (Local)</th>
+                  <th scope="col" className="px-4 py-3.5 font-semibold">Last Activity (Local)</th>
                   <th scope="col" className="px-4 py-3.5 font-semibold">First Source</th>
                   <th scope="col" className="px-4 py-3.5 font-semibold text-center">Unique Events</th>
                   <th scope="col" className="px-5 py-3.5 font-semibold">Milestone Stages</th>

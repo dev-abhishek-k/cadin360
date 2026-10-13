@@ -112,7 +112,7 @@ export default function Login() {
               disabled={submitting}
               className="w-full mt-2 rounded-xl bg-cyan-400 py-3.5 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-wait shadow-lg shadow-cyan-500/20"
             >
-              {submitting ? 'Authenticating…' : 'Sign In with HttpOnly Cookie'}
+              {submitting ? 'Authenticating…' : 'Sign In'}
             </button>
           </form>
 

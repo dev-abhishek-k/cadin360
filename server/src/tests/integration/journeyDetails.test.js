@@ -14,7 +14,7 @@ function generateToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 }
 
-test('Module 6: Journey Details & Timeline Integration Tests', async (t) => {
+test('Journey details, timeline, milestones, and access control', async (t) => {
   const adminToken = generateToken({
     id: 'admin_super_1',
     name: 'Super Admin',

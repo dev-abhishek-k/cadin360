@@ -14,9 +14,6 @@ export default function AuthPanel({
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
             Authentication & Identity
           </h3>
-          <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60">
-            Module 1 & 3
-          </span>
         </div>
       </div>
 

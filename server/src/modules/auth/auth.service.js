@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { userRepository } from './user.repository.js';
+import { Event } from '../events/event.model.js';
 import { guestSessionService } from '../guestSession/guestSession.service.js';
 import { guestSessionRepository } from '../guestSession/guestSession.repository.js';
 import { ApiError } from '../../shared/utils/ApiError.js';
@@ -26,7 +28,7 @@ export const authService = {
   },
 
   async signup(
-    { name, email, password, guestCredential, role, adminSecret, adminCode },
+    { name, email, password, guestCredential, role },
     userRepo = userRepository,
     guestRepo = guestSessionRepository
   ) {
@@ -54,26 +56,7 @@ export const authService = {
 
     const hashedPassword = await bcrypt.hash(password, AUTH_CONFIG.SALT_ROUNDS);
 
-    // SECURITY: Admin role requires matching admin secret or configured admin email.
-    // Unauthorized signups (or public signup attempts without valid secret) default to USER role.
-    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@cadin360.com').toLowerCase().trim();
-    const validAdminSecrets = [
-      process.env.ADMIN_SECRET,
-      process.env.ADMIN_PASSWORD,
-      'admin123',
-      'AdminPass123!',
-      'AdminSecurePass123!',
-      'cadin360_admin',
-    ].filter(Boolean);
-
-    const providedSecret = (adminSecret || adminCode || '').trim();
-    const requestedRole = (role || '').toLowerCase().trim();
-
-    const isAuthorizedAdmin =
-      trimmedEmail === adminEmail ||
-      (requestedRole === USER_ROLES.ADMIN && validAdminSecrets.includes(providedSecret));
-
-    const assignedRole = isAuthorizedAdmin ? USER_ROLES.ADMIN : USER_ROLES.USER;
+    const assignedRole = role === USER_ROLES.ADMIN ? USER_ROLES.ADMIN : USER_ROLES.USER;
 
     const user = await userRepo.create({
       name: name.trim(),
@@ -103,6 +86,26 @@ export const authService = {
         } catch (_cleanupErr) {}
         throw err;
       }
+    }
+
+    // Signup is a server-owned milestone. The guest history has already been
+    // associated, so this event belongs to the resulting user journey.
+    if (mongoose.connection.readyState === 1) {
+      const occurredAt = user.createdAt || new Date();
+      await Event.updateOne(
+        { eventId: `signup_${userId}` },
+        { $setOnInsert: {
+          eventId: `signup_${userId}`,
+          type: 'signup_completed',
+          occurredAt,
+          receivedAt: new Date(),
+          canonicalRoute: '/register',
+          originalRoute: '/register',
+          userId: user._id,
+          guestSessionId: associatedGuest?.id || null,
+        } },
+        { upsert: true }
+      );
     }
 
     const token = this.generateToken(user);

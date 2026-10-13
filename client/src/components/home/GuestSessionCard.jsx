@@ -17,9 +17,6 @@ export default function GuestSessionCard({
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               Guest Session
             </h3>
-            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/60">
-              Module 1
-            </span>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
             Cryptographic 256-bit unguessable guest credentials stored as SHA-256 hashes.
@@ -61,7 +58,7 @@ export default function GuestSessionCard({
                   <button
                     onClick={onAssociate}
                     className="text-xs bg-indigo-600/90 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1 rounded-lg transition shadow-sm"
-                    title="Associate this active guest session to your logged-in account (Module 3)"
+                    title="Associate this active guest session to your logged-in account"
                   >
                     Link to My Account
                   </button>

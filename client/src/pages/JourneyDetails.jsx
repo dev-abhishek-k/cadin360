@@ -91,7 +91,6 @@ export default function JourneyDetails() {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            timeZone: 'UTC',
             timeZoneName: 'short',
           });
     } catch (_e) {
@@ -282,7 +281,7 @@ export default function JourneyDetails() {
 
               <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80">
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                  First Activity
+                  First Activity (Local)
                 </span>
                 <span className="text-xs font-mono text-slate-200 font-semibold mt-2 block break-all">
                   {formatDate(data.firstActivityAt)}
@@ -292,7 +291,7 @@ export default function JourneyDetails() {
 
               <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80">
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                  Last Activity
+                  Last Activity (Local)
                 </span>
                 <span className="text-xs font-mono text-slate-200 font-semibold mt-2 block break-all">
                   {formatDate(data.lastActivityAt)}

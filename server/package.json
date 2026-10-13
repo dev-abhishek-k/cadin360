@@ -13,7 +13,8 @@
     "seed:admin": "node src/scripts/seedAdmin.js",
     "seed:journeys": "node src/scripts/seedJourneys.js",
     "explain": "node src/scripts/explainQueryPlan.js",
-    "promote:admin": "node src/scripts/promoteAdmin.js"
+    "promote:admin": "node src/scripts/promoteAdmin.js",
+    "backfill:signup-events": "node src/scripts/backfillSignupEvents.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

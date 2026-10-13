@@ -33,7 +33,7 @@ export default function Home() {
   const [testingSession, setTestingSession] = useState(false);
   const [generatingGuest, setGeneratingGuest] = useState(false);
 
-  // Module 2 & 4 Event tracking & journey state
+  // Event tracking and journey state
   const [journeyEvents, setJourneyEvents] = useState([]);
   const [journeySummary, setJourneySummary] = useState(null);
   const [loadingEvents, setLoadingEvents] = useState(false);
@@ -224,9 +224,6 @@ export default function Home() {
                   Visitor Journey Studio
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                  Modules 1–6 Integrated
-                </span>
               </div>
               <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
                 CADIN360 Journey Platform
@@ -270,7 +267,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Actions & Session Controls (Cols 1-6) */}
           <div className="lg:col-span-6 space-y-6">
-            {/* 1. Guest Session Card (Module 1) */}
+            {/* Guest Session Card */}
             <GuestSessionCard
               guestCredential={guestCredential}
               generatingGuest={generatingGuest}
@@ -284,7 +281,7 @@ export default function Home() {
               }}
             />
 
-            {/* 2. Interactive Event Simulator (Module 2) */}
+            {/* Interactive Event Simulator */}
             <EventTrackerActions
               loadingEvents={loadingEvents}
               onRefresh={loadEvents}
@@ -294,7 +291,7 @@ export default function Home() {
               lastIngestedEvent={lastIngestedEvent}
             />
 
-            {/* 3. Authentication Panel (Module 1 & 3) */}
+            {/* Authentication Panel */}
             <AuthPanel
               user={user}
               testingSession={testingSession}
@@ -306,7 +303,7 @@ export default function Home() {
 
           {/* Right Column: Live Journey Intelligence & Stream (Cols 7-12) */}
           <div className="lg:col-span-6 space-y-6">
-            {/* 4. Journey Overview & Milestone Funnel (Module 4) */}
+            {/* Journey Overview & Milestone Funnel */}
             <JourneyOverviewCard journeySummary={journeySummary} />
 
             {/* 5. Chronological Event Stream */}
